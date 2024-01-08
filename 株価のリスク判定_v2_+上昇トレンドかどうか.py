@@ -158,7 +158,7 @@ def on_click_execute():
     df["ma200"] = ma200
 
 ##############################################################
-    rdf = df[dt.datetime(2020,12,31):dt.datetime(entered_date.year, entered_date.month, entered_date.day)]
+    rdf = df[dt.datetime(2020,1,1):dt.datetime(entered_date.year, entered_date.month, entered_date.day)]
     rdf.index = pd.to_datetime(rdf.index).strftime("%m-%d-%Y")
 
 ##############################################################
