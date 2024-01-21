@@ -9,12 +9,12 @@ from datetime import datetime
 import yfinance as yf
 
 ##############################################################
-def get_us_stock_data(symbol):
-    df = yf.download(symbol, start="2020-01-01", end=datetime.now().strftime("%Y-%m-%d"))
+def get_us_stock_data_weekly(symbol):
+    df = yf.download(symbol, start="2020-01-01", end=datetime.now().strftime("%Y-%m-%d"), interval="1wk")
     return df
 
-def get_stock_data(code):
-    df = pdr.DataReader("{}.JP".format(code), "stooq").sort_index()
+def get_stock_data_weekly(code):
+    df = pdr.DataReader("{}.JP".format(code), "stooq", start="2020-01-01").resample('W-Mon').last()
     return df
 
 # ポイント評価用の関数を作成
@@ -114,14 +114,14 @@ def on_click_execute():
         except ValueError:
             print("有効な株価コードを入力してください")
             return
-        df = get_stock_data(entered_code)
+        df = get_stock_data_weekly(entered_code)
     else:  # アメリカの株の場合
         # Yahoo Finance APIを使用して銘柄情報を取得し、存在するかどうかを確認
         try:
             stock = yf.Ticker(entered_code)
             stock_info = stock.info
             if 'country' in stock_info and stock_info['country'] == 'United States':
-                df = get_us_stock_data(entered_code)
+                df = get_us_stock_data_weekly(entered_code)
             else:
                 print("有効なアメリカ株価コードを入力してください")
                 return

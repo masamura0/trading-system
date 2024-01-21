@@ -201,7 +201,11 @@ def on_click_execute():
     df["slowK"], df["slowD"] = slowK, slowD 
     df["80"],  df["20"] = [80 for _ in close], [20 for _ in close]  
 
-    rdf = df[dt.datetime(2020,1,1):dt.datetime(2024,1,13)]
+    # ボリンジャーバンドの算出
+    upper, _, lower = ta.BBANDS(close, timeperiod=25, nbdevup=2, nbdevdn=2, matype=0)
+    df['upper'], df['lower'] = upper, lower
+
+    rdf = df[dt.datetime.strptime(entry_start_date.get(), "%Y,%m,%d"):dt.datetime.strptime(entry_date.get(), "%Y,%m,%d")]
     rdf.index = pd.to_datetime(rdf.index).strftime("%m-%d-%Y")
 
     # トレンドを表示
@@ -233,6 +237,12 @@ def on_click_execute():
                 go.Scatter(x=crossing_dates, y=rdf.loc[crossing_dates, 'ma5'],
                                   mode='markers', marker=dict(color='purple', symbol='circle', size=10),
                                   name='MA5 crosses above MA50'),
+
+                # ボリンジャーバンド
+                go.Scatter(yaxis="y1", x=rdf.index ,y=rdf["upper"], name= "", line={ "color": "lavender", "width": 0 }),
+                go.Scatter(yaxis="y1", x=rdf.index ,y=rdf["lower"], name= "BB", line={ "color": "lavender", "width": 0},
+                      fill="tonexty", fillcolor="rgba(170,170,170,.3)"),
+
                 # MACD
                 go.Scatter(yaxis="y2" ,x=rdf.index ,y=rdf["macd"], name= "macd", line={ "color": "magenta", "width": 1 } ),
                 go.Scatter(yaxis="y2" ,x=rdf.index ,y=rdf["macd_signal"], name= "signal", line={ "color": "green", "width": 1 } ),
@@ -362,8 +372,3 @@ execute_button.grid(row=3, columnspan=3)
 
 # Tkinter main loop
 root.mainloop()
-
-
-
-
-
